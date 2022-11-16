@@ -20,3 +20,15 @@ services:
       - SERVER_URL=http://teamcity:8111
       - AGENT_NAME=teamcity-go-agent
       - OWN_PORT=9091
+
+  teamcity-docker-agent:
+    image: jetbrains/teamcity-agent
+    restart: always
+    depends_on:
+      - teamcity
+    privileged: true
+    environment:
+      - SERVER_URL=http://teamcity:8111
+      - AGENT_NAME=teamcity-go-agent
+      - OWN_PORT=9091
+      - DOCKER_IN_DOCKER=start
