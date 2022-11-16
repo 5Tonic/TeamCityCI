@@ -32,3 +32,5 @@ services:
       - AGENT_NAME=teamcity-docker-agent
       - OWN_PORT=9091
       - DOCKER_IN_DOCKER=start
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
