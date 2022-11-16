@@ -1,0 +1,22 @@
+version: '3.1'
+services:
+  teamcity:
+    image: jetbrains/teamcity-server
+    restart: always
+    volumes:
+    - /home/vepc/teamcity/datadir:/data/teamcity_server/datadir
+    - /home/vepc/teamcity/logs:/opt/teamcity/logs
+    ports:
+    - 8111:8111
+
+  teamcity-go-agent:
+    build:
+      context: ./
+      dockerfile: Dockerfile_go_agent
+    restart: always
+    depends_on:
+      - teamcity
+    environment:
+      - SERVER_URL=http://teamcity:8111
+      - AGENT_NAME=teamcity-go-agent
+      - OWN_PORT=9091
