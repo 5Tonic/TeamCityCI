@@ -1,0 +1,60 @@
+package _Self.buildTypes
+
+import jetbrains.buildServer.configs.kotlin.*
+import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
+import jetbrains.buildServer.configs.kotlin.buildSteps.DockerCommandStep
+import jetbrains.buildServer.configs.kotlin.buildSteps.dockerCommand
+import jetbrains.buildServer.configs.kotlin.triggers.vcs
+
+object BuildRaspberryPi : BuildType({
+    name = "Build - Raspberry Pi"
+
+    artifactRules = "goflowstats-arm"
+
+    vcs {
+        root(HttpsGithubCom5TonicGoflowstatsGitRefsHeadsMaster1)
+    }
+
+    steps {
+        dockerCommand {
+            name = "Build goflowstat in a Docker"
+            commandType = build {
+                source = file {
+                    path = "Dockerfile-raspi"
+                }
+                contextDir = "."
+                platform = DockerCommandStep.ImagePlatform.Linux
+                namesAndTags = "goflowstats-arm:latest"
+                commandArgs = "--pull"
+            }
+        }
+        dockerCommand {
+            commandType = other {
+                subCommand = "create"
+                workingDir = "."
+                commandArgs = "--name goflowstats-artifact goflowstats-arm:latest"
+            }
+        }
+        dockerCommand {
+            commandType = other {
+                subCommand = "cp"
+                workingDir = "."
+                commandArgs = "goflowstats-artifact:/build/goflowstats-arm ."
+            }
+        }
+    }
+
+    triggers {
+        vcs {
+        }
+    }
+
+    features {
+        perfmon {
+        }
+    }
+
+    requirements {
+        contains("teamcity.agent.name", "docker-agent")
+    }
+})
