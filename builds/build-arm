@@ -9,7 +9,10 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 object BuildRaspberryPi : BuildType({
     name = "Build - Raspberry Pi"
 
-    artifactRules = "goflowstats-arm"
+    artifactRules = """
+        goflowstats-arm
+        README.md
+    """.trimIndent()
 
     vcs {
         root(HttpsGithubCom5TonicGoflowstatsGitRefsHeadsMaster1)
@@ -29,6 +32,7 @@ object BuildRaspberryPi : BuildType({
             }
         }
         dockerCommand {
+            name = "Create container with the build"
             commandType = other {
                 subCommand = "create"
                 workingDir = "."
@@ -36,10 +40,19 @@ object BuildRaspberryPi : BuildType({
             }
         }
         dockerCommand {
+            name = "Copy artifacts"
             commandType = other {
                 subCommand = "cp"
                 workingDir = "."
                 commandArgs = "goflowstats-artifact:/build/goflowstats-arm ."
+            }
+        }
+        dockerCommand {
+            name = "Remove old containers"
+            commandType = other {
+                subCommand = "rm"
+                workingDir = "."
+                commandArgs = "goflowstats-artifact"
             }
         }
     }
